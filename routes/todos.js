@@ -1,11 +1,6 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET show todo. */
-router.get('/:id', function(req, res, next) {
-	  res.send(`respond with a resource id ${req.params.id}`);
-});
-
 /* GET todos listing. */
 router.get('/', function(req, res, next) {
 	  const mysql = require('mysql');
@@ -49,6 +44,30 @@ router.post('/', function(req, res, next) {
 			            if (err) throw err;
 
 			            res.send(`respond with a new resource ${title} ${content}`);
+			        });
+
+	  connection.end();
+});
+
+/* GET show todo. */
+router.get('/:id', function(req, res, next) {
+	  const mysql = require('mysql');
+	  const connection = mysql.createConnection({
+		      host: 'localhost',
+		      user: 'my_node_app',
+		      password: 'my_node_app',
+		      database: 'my_node_app'
+		    });
+
+	  connection.connect();
+
+	  const query = 'SELECT * FROM `todos` WHERE id = ?';
+	  connection.query(query,
+		      [req.params.id],
+		      (err, rows, fields) => {
+			            if (err) throw err;
+
+			            res.send(`TODO: ${rows[0].title} ${rows[0].content}`);
 			        });
 
 	  connection.end();
