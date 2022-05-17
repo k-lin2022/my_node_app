@@ -50,7 +50,10 @@ router.get('/:id', function(req, res, next) {
 		      (err, rows, fields) => {
 			            if (err) throw err;
 
-			            res.send(`TODO: ${rows[0].title} ${rows[0].content}`);
+                  res.render('todos/show', {
+                      title: rows[0].title,
+                      content: rows[0].content
+                  });
 			        });
 
 	  connection.end();
