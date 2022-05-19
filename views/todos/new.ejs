@@ -3,6 +3,9 @@
     <title>New TODO</title>
   </head>
   <body>
+    <% if (message) { %>
+      <p><%= message %></p>
+    <% } %>
     <h1>New TODO</h1>
     <form action="/todos" method="post">
       <input type="text" name="title" id="todo_title" requried>

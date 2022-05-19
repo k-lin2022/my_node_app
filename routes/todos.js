@@ -32,6 +32,8 @@ router.post('/', function(req, res, next) {
 		      (err, rows, fields) => {
 			            if (err) throw err;
 
+                  req.session.message = `A new resource was created: ${title} ${content}.`;
+
 			            res.redirect('/todos/new');
 			        });
 
@@ -61,7 +63,14 @@ router.get('/:id(\\d+)', function(req, res, next) {
 
 /* GET new todo. */
 router.get('/new', function(req, res, next) {
-    res.render('todos/new');
+    let message;
+
+    if (req.session.message) {
+      message = req.session.message;
+      req.session.message = null;
+    }
+
+    res.render('todos/new', { message: message });
 });
 
 module.exports = router;
