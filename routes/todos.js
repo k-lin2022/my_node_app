@@ -2,6 +2,18 @@ var express = require('express');
 var router = express.Router();
 const getDbConnection = require('../lib/db_connection');
 
+/* Deny not logged in users */
+router.use((req, res, next) => {
+  if (req.session && req.session.name) {
+    console.log('logged in user has come.');
+    next();
+  }
+  else {
+    console.log('NOT logged in user has come.');
+    res.sendStatus(401);
+  }
+})
+
 /* GET todos listing. */
 router.get('/', function(req, res, next) {
 	  const connection = getDbConnection();
