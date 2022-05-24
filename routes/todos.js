@@ -16,17 +16,22 @@ router.use((req, res, next) => {
 
 /* GET todos listing. */
 router.get('/', function(req, res, next) {
-	  const connection = getDbConnection();
+  const connection = getDbConnection();
+  connection.connect();
 
-	  connection.connect();
-	  
-	  connection.query('SELECT 1 + 1 AS solution', (err, rows, fields) => {
-		      if (err) throw err;
-		    
-		      res.send(`The solution is: ${rows[0].solution}`);
-		    })
-	  
-	  connection.end();
+  const fromDate = new Date(req.query.fromDate);
+  const toDate = new Date(req.query.toDate);
+
+  const query = 'SELECT * FROM `todos` WHERE ? <= `created_at` AND `updated_at` < ?';
+  const q = connection.query(query,
+    [fromDate, toDate],
+    (err, rows, fields) => {
+    if (err) throw err;
+
+    res.render('todos/index', { todos: rows });
+  })
+
+  connection.end();
 });
 
 /* POST create todo. */

@@ -1,0 +1,11 @@
+<html>
+  <head>
+    <title>Index of todos</title>
+  </head>
+  <body>
+    <h1>Index of todos</h1>
+    <% for (let todo of todos) { %>
+      <p><%= todo.title %> <%= todo.content %></p>
+    <% } %>
+  </body>
+</html>
