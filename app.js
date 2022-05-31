@@ -10,6 +10,11 @@ var indexRouter = require('./routes/index');
 var todosRouter = require('./routes/todos');
 var userSessionsRouter = require('./routes/user_sessions');
 
+let RedisStore = require("connect-redis")(session);
+const { createClient } = require("redis");
+let redisClient = createClient({ legacyMode: true });
+redisClient.connect().catch(console.error);
+
 var app = express();
 
 // view engine setup
@@ -25,7 +30,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
   secret: 'keyboard cat',
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  store: new RedisStore({ client: redisClient })
 }));
 
 app.use('/', indexRouter);
