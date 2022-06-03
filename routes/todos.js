@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const getDbConnection = require('../lib/db_connection');
+const getDbPool = require('../lib/db_pool');
 
 /* Deny not logged in users */
 router.use((req, res, next) => {
@@ -16,66 +16,55 @@ router.use((req, res, next) => {
 
 /* GET todos listing. */
 router.get('/', function(req, res, next) {
-  const connection = getDbConnection();
-  connection.connect();
+  const pool = getDbPool();
 
   const fromDate = new Date(req.query.fromDate);
   const toDate = new Date(req.query.toDate);
 
   const query = 'SELECT * FROM `todos` WHERE ? <= `created_at` AND `updated_at` < ?';
-  const q = connection.query(query,
+  const q = pool.query(query,
     [fromDate, toDate],
     (err, rows, fields) => {
     if (err) throw err;
 
     res.render('todos/index', { todos: rows });
   })
-
-  connection.end();
 });
 
 /* POST create todo. */
 router.post('/', function(req, res, next) {
 	  const title = req.body.title;
 	  const content = req.body.content;
-	  const connection = getDbConnection();
-
-	  connection.connect();
+	  const pool = getDbPool();
 
 	  const query = 'INSERT INTO `todos` (`title`, `content`, `created_at`, `updated_at`)' + 
 		    'VALUES (?, ?, SYSDATE(), SYSDATE())';
-	  connection.query(query,
-		      [title, content],
-		      (err, rows, fields) => {
-			            if (err) throw err;
+	  const q = pool.query(query,
+		               [title, content],
+		               (err, rows, fields) => {
+			                    if (err) throw err;
 
-                  req.session.message = `A new resource was created: ${title} ${content}.`;
+                          req.session.message = `A new resource was created: ${title} ${content}.`;
 
-			            res.redirect('/todos/new');
-			        });
-
-	  connection.end();
+			                    res.redirect('/todos/new');
+			              });
 });
 
 /* GET show todo. */
 router.get('/:id(\\d+)', function(req, res, next) {
-    const connection = getDbConnection();
-
-	  connection.connect();
+    const pool = getDbPool();
 
 	  const query = 'SELECT * FROM `todos` WHERE id = ?';
-	  connection.query(query,
-		      [req.params.id],
-		      (err, rows, fields) => {
-			            if (err) throw err;
+	  const q = connection.query(query,
+		               [req.params.id],
+		               (err, rows, fields) => {
+			                     if (err) throw err;
 
-                  res.render('todos/show', {
-                      title: rows[0].title,
-                      content: rows[0].content
-                  });
-			        });
-
-	  connection.end();
+                           res.render('todos/show', {
+                               title: rows[0].title,
+                               content: rows[0].content
+                           });
+			              });
 });
 
 /* GET new todo. */
