@@ -12,7 +12,7 @@ router.use((req, res, next) => {
     console.log('NOT logged in user has come.');
     res.sendStatus(401);
   }
-})
+});
 
 /* GET todos listing. */
 router.get('/', function(req, res, next) {
@@ -20,15 +20,16 @@ router.get('/', function(req, res, next) {
 
   const fromDate = new Date(req.query.fromDate);
   const toDate = new Date(req.query.toDate);
+  const maxCount = 100;
 
-  const query = 'SELECT * FROM `todos` WHERE ? <= `created_at` AND `updated_at` < ?';
+  const query = 'SELECT * FROM `todos` WHERE ? <= `created_at` AND `created_at` < ? LIMIT ?';
   const q = pool.query(query,
-    [fromDate, toDate],
+    [fromDate, toDate, maxCount],
     (err, rows, fields) => {
     if (err) throw err;
 
     res.render('todos/index', { todos: rows });
-  })
+  });
 });
 
 /* POST create todo. */
@@ -55,7 +56,7 @@ router.get('/:id(\\d+)', function(req, res, next) {
     const pool = getDbPool();
 
 	  const query = 'SELECT * FROM `todos` WHERE id = ?';
-	  const q = connection.query(query,
+	  const q = pool.query(query,
 		               [req.params.id],
 		               (err, rows, fields) => {
 			                     if (err) throw err;
